@@ -29,7 +29,7 @@ public class Tests {
         $("[placeholder='Дата встречи']").setValue(dataGenerator.generateDate(4));
         $$("button").find(exactText("Запланировать")).click();
         $$(".button__text").find(exactText("Перепланировать")).click();
-        $(".notification__content").shouldHave(exactText("Встреча успешно запланирована на " + dataGenerator.generateDate(3)));
+        $(".notification__content").shouldHave(exactText("Встреча успешно запланирована на " + dataGenerator.generateDate(4)));
 
     }
 }
