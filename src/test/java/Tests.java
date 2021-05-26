@@ -1,25 +1,35 @@
-import com.github.javafaker.CreditCardType;
-import com.github.javafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 
-import java.util.Locale;
+import static com.codeborne.selenide.Condition.exactText;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.*;
 
 public class Tests {
-    private Faker faker;
+    private final DataGenerator dataGenerator = new DataGenerator();
 
     @BeforeEach
-    void setUpAll(){
-        faker = new Faker(new Locale("ru"));
+    void setUp(){
+        open("http://localhost:7777");
     }
 
     @Test
-    void shouldUseFaker(){
-        String name = faker.name().fullName();
-        String phone = faker.phoneNumber().phoneNumber();
-        String cardNumber = faker.finance().creditCard(CreditCardType.MASTERCARD);
-        System.out.println(name);
-        System.out.println(phone);
-        System.out.println(cardNumber);
+    void shouldPass() throws InterruptedException {
+        $("[placeholder='Город']").sendKeys(dataGenerator.generateCity());
+        $("[placeholder='Дата встречи']").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[placeholder='Дата встречи']").setValue(dataGenerator.generateDate(3));
+        $("[name='name']").sendKeys(dataGenerator.generateName());
+        $("[name='phone']").sendKeys(dataGenerator.generatePhone());
+        $("[data-test-id='agreement']").click();
+        $$("button").find(exactText("Запланировать")).click();
+        $(".notification__content").shouldHave(exactText("Встреча успешно запланирована на " + dataGenerator.generateDate(3)));
+        Thread.sleep(5000);
+        $("[placeholder='Дата встречи']").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[placeholder='Дата встречи']").setValue(dataGenerator.generateDate(4));
+        $$("button").find(exactText("Запланировать")).click();
+        $$(".button__text").find(exactText("Перепланировать")).click();
+        $(".notification__content").shouldHave(exactText("Встреча успешно запланирована на " + dataGenerator.generateDate(4)));
+
     }
 }
